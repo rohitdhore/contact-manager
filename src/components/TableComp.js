@@ -6,6 +6,8 @@ import TableCell from '@material-ui/core/TableCell/index';
 import TableHead from '@material-ui/core/TableHead/index';
 import TableRow from '@material-ui/core/TableRow/index';
 import Paper from '@material-ui/core/Paper/index';
+import FormField from "./FormField";
+import PropTypes from "prop-types";
 
 const StyledTableCell = withStyles(theme => ({
 	head: {
@@ -63,6 +65,10 @@ const CustomizedTables = (props) => {
 			</Table>
 		</Paper>
 	);
+};
+
+FormField.propTypes = {
+	tags: PropTypes.object.isRequired
 };
 
 export default CustomizedTables;

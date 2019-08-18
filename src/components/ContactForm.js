@@ -93,7 +93,7 @@ class ContactForm extends Component {
 			case 'gender':
 				errTxt =
 					len < 4
-						? 'Select gender'
+						? 'Please select gender'
 						: '';
 				break;
 			case 'country':
@@ -194,9 +194,9 @@ class ContactForm extends Component {
 						<div>
 							<RadioButtonGroup
 								name="gender"
-								value={gender} />
 								errors={errors}
 								changeData={this.handleChange}
+								value={gender} />
 							<CountryRegionWrapper>
 								<TextField
 									id="country"
@@ -242,15 +242,15 @@ class ContactForm extends Component {
 								errors={this.state.errors}
 								changeData={this.handleChange}
 							/>
+							<ActionBar>
+								<Button variant="contained" color="secondary" component="span" onClick={this.clearContact}>
+									Clear
+								</Button>
+								<Button variant="contained" color="primary" component="span" onClick={this.handleSubmit}>
+									Submit
+								</Button>
+							</ActionBar>
 						</div>
-						<ActionBar>
-							<Button variant="contained" color="secondary" component="span" onClick={this.clearContact}>
-								Clear
-							</Button>
-							<Button variant="contained" color="primary" component="span" onClick={this.handleSubmit}>
-								Submit
-							</Button>
-						</ActionBar>
 					</form>
 				</div>
 			</div>

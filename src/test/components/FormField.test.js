@@ -5,6 +5,8 @@ import FormField from '../../components/FormField';
 const baseProps = {
 	// whatever fake props you want passed to the component
 	name: 'name',
+	label: 'Name',
+	value: 'test',
 	errors: {'name': ''},
 	changeData: () => {}
 };

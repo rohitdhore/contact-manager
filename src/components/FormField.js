@@ -2,6 +2,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import styled from 'styled-components';
 import ErrorText from "./ErrorText";
+import PropTypes from "prop-types";
 
 const TextWrapper = styled.div`
 	display: flex;
@@ -26,6 +27,13 @@ const FormField = (props) => {
 			<ErrorText value={errors[name]} />}
 		</TextWrapper>
 	);
+};
+
+FormField.propTypes = {
+	label: PropTypes.string.isRequired,
+	name: PropTypes.string.isRequired,
+	value: PropTypes.string.isRequired,
+	changeData: PropTypes.func.isRequired
 };
 
 export default FormField;

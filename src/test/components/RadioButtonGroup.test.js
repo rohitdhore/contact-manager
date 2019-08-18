@@ -6,6 +6,7 @@ const baseProps = {
 	// whatever fake props you want passed to the component
 	name: 'gender',
 	errors: {'gender': ''},
+	value: '',
 	changeData: jest.fn()
 };
 const radioButtonGroup = shallow(<RadioButtonGroup {...baseProps} />);

@@ -6,6 +6,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel/index';
 import FormControl from '@material-ui/core/FormControl/index';
 import FormLabel from '@material-ui/core/FormLabel/index';
 import ErrorText from './ErrorText';
+import PropTypes from "prop-types";
+import FormField from "./FormField";
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -31,15 +33,23 @@ const RadioButtonsGroup = (props) => {
 					name="gender"
 					className={classes.group}
 					value={value}
-					onChange={props.changeData(name)}
+					onChange={props.changeData('gender')}
 				>
 					<FormControlLabel value="female" control={<Radio />} label="Female" />
 					<FormControlLabel value="male" control={<Radio />} label="Male" />
 				</RadioGroup>
-				{errors[name].length > 0 && <ErrorText value={errors[name]} />}
+				{errors[name].length > 0 &&
+				<ErrorText value={errors[name]} />}
 			</FormControl>
 		</div>
 	);
+};
+
+FormField.propTypes = {
+	name: PropTypes.string.isRequired,
+	errors: PropTypes.object.isRequired,
+	changeData: PropTypes.func.isRequired,
+	value: PropTypes.string.isRequired
 };
 
 export default RadioButtonsGroup;
