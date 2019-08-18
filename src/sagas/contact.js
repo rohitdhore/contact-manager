@@ -17,8 +17,10 @@ export function* addContactEffectSaga(action) {
     try {
 	    let data  = yield call(addContactApi, action.payload);
 	    yield put(contactListWatcher(data));
+	    action.resolve();
 	} catch (e) {
 	    console.log(e);
+	    action.reject(e);
 	}    
 }
 
@@ -44,10 +46,12 @@ export function* getContactEffectSaga(action) {
 export function* deleteContactEffectSaga(action) {
 	// data is obtained after axios call is resolved
 	try {
-		let { data } = yield call(deleteContactApi, action.payload);
+		let data  = yield call(deleteContactApi, action.payload.index);
 		yield put(contactListWatcher(data));
+		action.resolve();
 	} catch (e) {
 		console.log(e);
+		action.reject(e);
 	}
 }
 

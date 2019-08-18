@@ -15,8 +15,11 @@ export function editContactApi(action) {
 	return []
 }
 
-export function deleteContactApi(action) {
-	return []
+export function deleteContactApi(index) {
+	const contacts = storedList('contacts') || [];
+	contacts.splice(index, 1);
+	saveToStorage('contacts', contacts);
+	return contacts;
 }
 
 export function getContactApi(payload) {
