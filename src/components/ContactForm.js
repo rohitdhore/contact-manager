@@ -7,7 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import MenuItem from "@material-ui/core/MenuItem";
 import RadioButtonGroup from './RadioButtonGroup';
 import FormField from './FormField';
-import ErrorText from "./ErrorText";
+import InfoText from "./InfoText";
 import { validateForm, validEmailRegex } from '../utils/formValidation';
 import { bindActionCreators } from 'redux';
 import  { addContactWatcher, contactListWatcher }  from '../actions';
@@ -19,6 +19,7 @@ const CountryRegionWrapper = styled.div`
 `;
 
 const ActionBar = styled.div`
+	padding: 20px 0;
 	display: flex;
 	justify-content: space-between;
 `;
@@ -136,9 +137,16 @@ class ContactForm extends Component {
 				this.updateError(this.state.contact[name], name)
 			}
 		);
+		this.setState({ newRecordAdded: false});
 		if(validateForm(this.state.errors, this.state.dirty)) {
-			console.info('Valid Form');
-			this.props.addContactWatcher(this.state.contact);
+			new Promise((resolve, reject) => {
+				this.props.addContactWatcher(this.state.contact, resolve, reject);
+			}).then(() => {
+				this.setState({ newRecordAdded: true});
+				this.clearContact();
+			}).catch((error) => {
+				console.log(error);
+			});
 		}else{
 			console.error('Invalid Form');
 		}
@@ -153,7 +161,7 @@ class ContactForm extends Component {
 
 	render() {
 		const {name, address, phone, email, gender, country, region, note} = this.state.contact;
-		const { errors } = this.state;
+		const { errors, newRecordAdded } = this.state;
 
 		return (
 			<div className='wrapper'>
@@ -204,7 +212,7 @@ class ContactForm extends Component {
 									value={country}
 									select
 									required={true}
-									onChange={this.handleChange("country")}
+									onChange={this.handleChange('country')}
 								>
 									{CountryRegionData.map((option, index) => (
 										<MenuItem key={index} value={option}>
@@ -213,7 +221,7 @@ class ContactForm extends Component {
 									))}
 								</TextField>
 								{errors['country'].length > 0 &&
-									<ErrorText value={errors['country']} />}
+									<InfoText value={errors['country']} type={'error'} />}
 								<TextField
 									id="region"
 									label="Region"
@@ -231,7 +239,7 @@ class ContactForm extends Component {
 									)}
 								</TextField>
 								{errors['region'].length > 0 &&
-								<ErrorText value={errors['region']} />}
+								<InfoText value={errors['region']} type={'error'} />}
 							</CountryRegionWrapper>
 							<FormField
 								id="standard-note"
@@ -250,6 +258,7 @@ class ContactForm extends Component {
 									Submit
 								</Button>
 							</ActionBar>
+							{newRecordAdded && <InfoText value={'New record added successfully!'} type={'success'} />}
 						</div>
 					</form>
 				</div>

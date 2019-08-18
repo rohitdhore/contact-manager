@@ -7,6 +7,6 @@ export default function* rootSaga() {
 		addContactWatcherSaga(),
 		editContactWatcherSaga(),
 		getContactWatcherSaga(),
-		deleteContactWatcherSaga
+		deleteContactWatcherSaga()
 	]);
 }

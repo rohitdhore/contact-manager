@@ -1,7 +1,9 @@
-export function addContactWatcher(data) {
+export function addContactWatcher(data, resolve, reject) {
   return {
     type: 'ADD_CONTACT_WATCHER',
-    payload: data
+    payload: data,
+    resolve: resolve,
+    reject: reject
   };
 }
 
@@ -31,5 +33,14 @@ export function getContactWatcher(data) {
   return {
     type: 'GET_CONTACT_WATCHER',
     payload: data
+  };
+}
+
+export function deleteContactWatcher(data, resolve, reject) {
+  return {
+    type: 'DELETE_CONTACT_WATCHER',
+    payload: data,
+    resolve: resolve,
+    reject: reject
   };
 }

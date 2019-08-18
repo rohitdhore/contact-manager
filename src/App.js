@@ -42,7 +42,7 @@ const App = (props) => {
             </FormWrapper>
           </Grid>
           <Grid item xs={12} sm={8}>
-            <TableCompStyled tags={['Name', 'Address', 'Phone', 'Email', 'Gender', 'Country', 'Note' ]} records={props.contacts}/>
+            <TableCompStyled tags={['Name', 'Address', 'Phone', 'Email', 'Gender', 'Country', 'Note', '' ]} records={props.contacts} />
           </Grid>
         </Grid>
       </div>
