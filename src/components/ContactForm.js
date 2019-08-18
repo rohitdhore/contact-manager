@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import styled  from 'styled-components';
 import Button from '@material-ui/core/Button/index';
@@ -24,27 +24,8 @@ const ActionBar = styled.div`
 	justify-content: space-between;
 `;
 
-class ContactForm extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			contact: this.getDefaultContact(),
-			errors: this.getDefaultContact(),
-			dirty: false
-		};
-	}
-
-	getRegions = country => {
-		if (!country) {
-			return [];
-		}
-		return country[2].split("|").map(regionPair => {
-			let [regionName, regionShortCode = null] = regionPair.split("~");
-			return regionName;
-		});
-	};
-
-	getDefaultContact = () => {
+const ContactForm = props => {
+	const getDefaultContact = () => {
 		return {
 			name:'',
 			address: '',
@@ -57,12 +38,29 @@ class ContactForm extends Component {
 		}
 	};
 
-	componentDidMount(){
-		this.props.contactListWatcher({});
-	}
+	const [contactState, setContactState] = useState({
+		contact: getDefaultContact(),
+		errors: getDefaultContact(),
+		dirty: false,
+		newRecordAdded: false
+	});
 
-	updateError = (value, name) => {
-		let errors = this.state.errors;
+	const getRegions = country => {
+		if (!country) {
+			return [];
+		}
+		return country[2].split("|").map(regionPair => {
+			let [regionName, regionShortCode = null] = regionPair.split("~");
+			return regionName;
+		});
+	};
+
+	useEffect(() => {
+		props.contactListWatcher({});
+	});
+
+	const updateError = (value, name) => {
+		let errors = contactState.errors;
 		let errTxt = '';
 		const len = value.length;
 
@@ -120,30 +118,43 @@ class ContactForm extends Component {
 		}
 
 		errors[name] = errTxt;
-		let contact = this.state.contact;
+		let contact = contactState.contact;
 		contact[name] = value;
-		this.setState({errors, contact, dirty: true});
+		setContactState({errors, contact, dirty: true});
 	};
 
-	handleChange = name => event => {
+	const handleChange = name => event => {
 		event.preventDefault();
-		this.updateError(event.target.value, name);
+		updateError(event.target.value, name);
 	};
 
-	handleSubmit = () => {
-		const fields = Object.keys(this.getDefaultContact());
+	const clearContact = () => {
+		setContactState({
+			contact: getDefaultContact(),
+			errors: getDefaultContact()
+		})
+	};
+
+	const handleSubmit = () => {
+		setContactState({
+			...contactState,
+			newRecordAdded: false
+		});
+		const fields = Object.keys(getDefaultContact());
 		fields.forEach(
 			(name) => {
-				this.updateError(this.state.contact[name], name)
+				updateError(contactState.contact[name], name)
 			}
 		);
-		this.setState({ newRecordAdded: false});
-		if(validateForm(this.state.errors, this.state.dirty)) {
+		if(validateForm(contactState.errors, contactState.dirty)) {
 			new Promise((resolve, reject) => {
-				this.props.addContactWatcher(this.state.contact, resolve, reject);
+				props.addContactWatcher(contactState.contact, resolve, reject);
 			}).then(() => {
-				this.setState({ newRecordAdded: true});
-				this.clearContact();
+				setContactState({
+					...contactState,
+					newRecordAdded: false
+				});
+				clearContact();
 			}).catch((error) => {
 				console.log(error);
 			});
@@ -152,120 +163,113 @@ class ContactForm extends Component {
 		}
 	};
 
-	clearContact = () => {
-		this.setState({
-			contact: this.getDefaultContact(),
-			errors: this.getDefaultContact()
-		})
-	};
 
-	render() {
-		const {name, address, phone, email, gender, country, region, note} = this.state.contact;
-		const { errors, newRecordAdded } = this.state;
 
-		return (
-			<div className='wrapper'>
-				<div className='form-wrapper'>
-					<form onSubmit={this.handleSubmit} noValidate>
-						<FormField
-							id="standard-name"
-							label="Name"
-							name="name"
-							value={name}
+	const {name, address, phone, email, gender, country, region, note} = contactState.contact;
+	const { errors, newRecordAdded } = contactState;
+
+	return (
+		<div className='wrapper'>
+			<div className='form-wrapper'>
+				<form noValidate>
+					<FormField
+						id="standard-name"
+						label="Name"
+						name="name"
+						value={name}
+						errors={errors}
+						changeData={handleChange}
+					/>
+					<FormField
+						id="standard-address"
+						label="Address"
+						name="address"
+						value={address}
+						errors={errors}
+						changeData={handleChange}
+					/>
+					<FormField
+						id="standard-phone"
+						label="Phone"
+						name="phone"
+						value={phone}
+						errors={errors}
+						changeData={handleChange}
+					/>
+					<FormField
+						id="standard-email"
+						label="Email"
+						name="email"
+						value={email}
+						errors={errors}
+						changeData={handleChange}
+					/>
+					<div>
+						<RadioButtonGroup
+							name="gender"
 							errors={errors}
-							changeData={this.handleChange}
-						/>
-						<FormField
-							id="standard-address"
-							label="Address"
-							name="address"
-							value={address}
-							errors={errors}
-							changeData={this.handleChange}
-						/>
-						<FormField
-							id="standard-phone"
-							label="Phone"
-							name="phone"
-							value={phone}
-							errors={errors}
-							changeData={this.handleChange}
-						/>
-						<FormField
-							id="standard-email"
-							label="Email"
-							name="email"
-							value={email}
-							errors={errors}
-							changeData={this.handleChange}
-						/>
-						<div>
-							<RadioButtonGroup
-								name="gender"
-								errors={errors}
-								changeData={this.handleChange}
-								value={gender} />
-							<CountryRegionWrapper>
-								<TextField
-									id="country"
-									label="Country"
-									value={country}
-									select
-									required={true}
-									onChange={this.handleChange('country')}
-								>
-									{CountryRegionData.map((option, index) => (
-										<MenuItem key={index} value={option}>
-											{option[0]}
-										</MenuItem>
-									))}
-								</TextField>
-								{errors['country'].length > 0 &&
-									<InfoText value={errors['country']} type={'error'} />}
-								<TextField
-									id="region"
-									label="Region"
-									value={region}
-									select
-									required={true}
-									onChange={this.handleChange("region")}
-								>
-									{this.getRegions(country).map(
-										(option, index) => (
-											<MenuItem key={index} value={option}>
-												{option}
-											</MenuItem>
-										)
-									)}
-								</TextField>
-								{errors['region'].length > 0 &&
-								<InfoText value={errors['region']} type={'error'} />}
-							</CountryRegionWrapper>
-							<FormField
-								id="standard-note"
-								label="Note"
-								name="note"
-								value={note}
+							changeData={handleChange}
+							value={gender} />
+						<CountryRegionWrapper>
+							<TextField
+								id="country"
+								label="Country"
+								value={country}
+								select
 								required={true}
-								errors={this.state.errors}
-								changeData={this.handleChange}
-							/>
-							<ActionBar>
-								<Button variant="contained" color="secondary" component="span" onClick={this.clearContact}>
-									Clear
-								</Button>
-								<Button variant="contained" color="primary" component="span" onClick={this.handleSubmit}>
-									Submit
-								</Button>
-							</ActionBar>
-							{newRecordAdded && <InfoText value={'New record added successfully!'} type={'success'} />}
-						</div>
-					</form>
-				</div>
+								onChange={handleChange('country')}
+							>
+								{CountryRegionData.map((option, index) => (
+									<MenuItem key={index} value={option}>
+										{option[0]}
+									</MenuItem>
+								))}
+							</TextField>
+							{errors['country'].length > 0 &&
+								<InfoText value={errors['country']} type={'error'} />}
+							<TextField
+								id="region"
+								label="Region"
+								value={region}
+								select
+								required={true}
+								onChange={handleChange("region")}
+							>
+								{getRegions(country).map(
+									(option, index) => (
+										<MenuItem key={index} value={option}>
+											{option}
+										</MenuItem>
+									)
+								)}
+							</TextField>
+							{errors['region'].length > 0 &&
+							<InfoText value={errors['region']} type={'error'} />}
+						</CountryRegionWrapper>
+						<FormField
+							id="standard-note"
+							label="Note"
+							name="note"
+							value={note}
+							required={true}
+							errors={contactState.errors}
+							changeData={handleChange}
+						/>
+						<ActionBar>
+							<Button variant="contained" color="secondary" component="span" onClick={clearContact}>
+								Clear
+							</Button>
+							<Button variant="contained" color="primary" component="span" onClick={handleSubmit}>
+								Submit
+							</Button>
+						</ActionBar>
+						{newRecordAdded && <InfoText value={'New record added successfully!'} type={'success'} />}
+					</div>
+				</form>
 			</div>
-		);
-	}
-}
+		</div>
+	);
+};
 
 const mapDispatchToProps = (dispatch) => {
 	return bindActionCreators({
