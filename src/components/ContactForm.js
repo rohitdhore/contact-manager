@@ -57,7 +57,7 @@ const ContactForm = props => {
 
 	useEffect(() => {
 		props.contactListWatcher({});
-	});
+	}, []);
 
 	const updateError = (value, name) => {
 		let errors = contactState.errors;
