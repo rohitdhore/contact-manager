@@ -47,6 +47,6 @@
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "gh-pages": "^2.1.1",
-    "jest-cli": "^20.0.4"
+    "jest-cli": "^29.3.1"
   }
 }
